@@ -47,7 +47,7 @@ $menu_items                = apply_filters(
 
 <div class="woo-wallet-my-wallet-container">
 	<div class="woo-wallet-sidebar">
-		<h3 class="woo-wallet-sidebar-heading"><a href="<?php echo $is_rendred_from_myaccount ? esc_url( wc_get_account_endpoint_url( get_option( 'woocommerce_woo_wallet_endpoint', 'woo-wallet' ) ) ) : esc_url( get_permalink() ); ?>"><?php echo apply_filters( 'woo_wallet_account_menu_title', __( 'My Wallet', 'woo-wallet' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></a></h3>
+		<h3 class="woo-wallet-sidebar-heading"><a href="<?php echo $is_rendred_from_myaccount ? esc_url( wc_get_account_endpoint_url( get_option( 'woocommerce_woo_wallet_endpoint', 'woo-wallet' ) ) ) : esc_url( get_permalink() ); ?>"><?php echo apply_filters( 'woo_wallet_account_menu_title', __( 'My Wallet Gro', 'woo-wallet' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?></a></h3>
 		<ul>
 			<?php foreach ( $menu_items as $item => $menu_item ) : ?>
 				<?php if ( apply_filters( 'woo_wallet_is_enable_' . $item, true ) ) : ?>
@@ -77,6 +77,53 @@ $menu_items                = apply_filters(
 						<?php wp_nonce_field( 'woo_wallet_topup', 'woo_wallet_topup' ); ?>
 						<input type="submit" name="woo_add_to_wallet" class="woo-add-to-wallet" value="<?php esc_html_e( 'Add', 'woo-wallet' ); ?>" />
 					</div>
+					<style>
+						.all-payment {
+							margin-top: 50px;
+						}
+						.gatewaya-box {
+							padding: 10px 20px; 
+							margin: 10px; 
+							border: 1px solid #ccc; 
+							border-radius: 5px; 
+							background: #fff;
+						}
+						.gatewaya-box img {
+							width: 20%;
+							height: auto;
+						}
+					</style>
+					<div class="all-payment">
+						<?php 
+						// Check if WooCommerce is active
+						if (class_exists('Wc_Payment_Gateways')){
+							// Get active payment gateways
+							$payment_gateways = WC_Payment_Gateways::instance()->get_available_payment_gateways();
+
+							// Loop through the active payment gateways and display their names
+							foreach($payment_gateways as $gateway) {
+								$image_url = $gateway->get_icon();
+								$title = $gateway->get_title();?>
+								<div class="gatewaya-box">
+									<?php
+										if(!empty($image_url)){
+											echo $image_url;
+										}else {
+											echo "<span>" . $title . "</span>";
+										}
+									?>
+								</div>
+
+								<?php
+							}
+							
+						}
+
+
+						?>
+					</div>
+
+
 				</form>
 			<?php } elseif ( apply_filters( 'woo_wallet_is_enable_transfer', 'on' === woo_wallet()->settings_api->get_option( 'is_enable_wallet_transfer', '_wallet_settings_general', 'on' ) ) && ( ( isset( $wp->query_vars['woo-wallet'] ) && 'transfer' === $wp->query_vars['woo-wallet'] ) || ( isset( $_GET['wallet_action'] ) && 'transfer' === $_GET['wallet_action'] ) ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended ?> 
 				<form method="post" action="" id="woo_wallet_transfer_form">
@@ -130,6 +177,7 @@ $menu_items                = apply_filters(
 		}
 		?>
 	</div>
+	
 </div>
 <?php
 do_action( 'woo_wallet_after_my_wallet_content' );
