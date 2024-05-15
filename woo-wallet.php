@@ -67,4 +67,14 @@ function woo_wallet() {
 	return WooWallet::instance();
 }
 
+add_action('init', 'process_woo_wallet_form_submission');
+function process_woo_wallet_form_submission() {
+    if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['woo_add_to_wallet'])) {
+        if (isset($_POST['selected_payment_gateway'])) {
+            $selected_gateway = sanitize_text_field($_POST['selected_payment_gateway']);
+            setcookie('selected_payment_gateway', $selected_gateway, time() + 3600, '/');
+        }
+    }
+}
+
 $GLOBALS['woo_wallet'] = woo_wallet();

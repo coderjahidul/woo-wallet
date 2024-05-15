@@ -65,7 +65,8 @@ $menu_items                = apply_filters(
 		<div style="clear: both"></div>
 		<hr/>
 		<?php if ( ( isset( $wp->query_vars['woo-wallet'] ) && ! empty( $wp->query_vars['woo-wallet'] ) ) || isset( $_GET['wallet_action'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended ?>
-			<?php if ( apply_filters( 'woo_wallet_is_enable_top_up', true ) && ( ( isset( $wp->query_vars['woo-wallet'] ) && 'add' === $wp->query_vars['woo-wallet'] ) || ( isset( $_GET['wallet_action'] ) && 'add' === $_GET['wallet_action'] ) ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended ?>
+			<?php if ( apply_filters( 'woo_wallet_is_enable_top_up', true ) && ( ( isset( $wp->query_vars['woo-wallet'] ) && 'add' === $wp->query_vars['woo-wallet'] ) || ( isset( $_GET['wallet_action'] ) && 'add' === $_GET['wallet_action'] ) ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended 
+				?>
 				<form method="post" action="">
 					<div class="woo-wallet-add-amount">
 						<label for="woo_wallet_balance_to_add"><?php esc_html_e( 'Enter amount', 'woo-wallet' ); ?></label>
@@ -73,11 +74,7 @@ $menu_items                = apply_filters(
 						$min_amount = woo_wallet()->settings_api->get_option( 'min_topup_amount', '_wallet_settings_general', 0 );
 						$max_amount = woo_wallet()->settings_api->get_option( 'max_topup_amount', '_wallet_settings_general', '' );
 						?>
-						<input type="number" step="0.01" min="<?php echo esc_attr( $min_amount ); ?>" max="<?php echo esc_attr( $max_amount ); ?>" name="woo_wallet_balance_to_add" id="woo_wallet_balance_to_add" class="woo-wallet-balance-to-add" required="" />
-						<?php wp_nonce_field( 'woo_wallet_topup', 'woo_wallet_topup' ); ?>
-						<input type="submit" name="woo_add_to_wallet" class="woo-add-to-wallet" value="<?php esc_html_e( 'Add', 'woo-wallet' ); ?>" />
-					</div>
-					<style>
+						<style>
 						.all-payment {
 							margin-top: 50px;
 						}
@@ -99,31 +96,27 @@ $menu_items                = apply_filters(
 						if (class_exists('Wc_Payment_Gateways')){
 							// Get active payment gateways
 							$payment_gateways = WC_Payment_Gateways::instance()->get_available_payment_gateways();
-
+							
 							// Loop through the active payment gateways and display their names
 							foreach($payment_gateways as $gateway) {
 								$image_url = $gateway->get_icon();
-								$title = $gateway->get_title();?>
-								<div class="gatewaya-box">
-									<?php
-										if(!empty($image_url)){
-											echo $image_url;
-										}else {
-											echo "<span>" . $title . "</span>";
-										}
-									?>
-								</div>
-
+								$title = $gateway->get_title();
+								$gateway_id = $gateway->id;
+								?>
+									<input type="radio" id="<?php echo $gateway_id;?>" name="selected_payment_gateway" value="<?php echo $gateway_id;?>">
+									<label for="<?php echo $gateway_id;?>"><?php echo $title; ?></label><br>
+									
 								<?php
 							}
-							
 						}
 
 
 						?>
 					</div>
-
-
+						<input type="number" step="0.01" min="<?php echo esc_attr( $min_amount ); ?>" max="<?php echo esc_attr( $max_amount ); ?>" name="woo_wallet_balance_to_add" id="woo_wallet_balance_to_add" class="woo-wallet-balance-to-add" required="" />
+						<?php wp_nonce_field( 'woo_wallet_topup', 'woo_wallet_topup' ); ?>
+						<input type="submit" name="woo_add_to_wallet" class="woo-add-to-wallet" value="<?php esc_html_e( 'Add', 'woo-wallet' ); ?>" />
+					</div>
 				</form>
 			<?php } elseif ( apply_filters( 'woo_wallet_is_enable_transfer', 'on' === woo_wallet()->settings_api->get_option( 'is_enable_wallet_transfer', '_wallet_settings_general', 'on' ) ) && ( ( isset( $wp->query_vars['woo-wallet'] ) && 'transfer' === $wp->query_vars['woo-wallet'] ) || ( isset( $_GET['wallet_action'] ) && 'transfer' === $_GET['wallet_action'] ) ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended ?> 
 				<form method="post" action="" id="woo_wallet_transfer_form">
