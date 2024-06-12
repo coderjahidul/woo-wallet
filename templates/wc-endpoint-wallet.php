@@ -67,7 +67,7 @@ $menu_items                = apply_filters(
 		<?php if ( ( isset( $wp->query_vars['woo-wallet'] ) && ! empty( $wp->query_vars['woo-wallet'] ) ) || isset( $_GET['wallet_action'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended ?>
 			<?php if ( apply_filters( 'woo_wallet_is_enable_top_up', true ) && ( ( isset( $wp->query_vars['woo-wallet'] ) && 'add' === $wp->query_vars['woo-wallet'] ) || ( isset( $_GET['wallet_action'] ) && 'add' === $_GET['wallet_action'] ) ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended 
 				?>
-				<form method="post" action="">
+				<form method="post" action="" onsubmit="return validateForm()">
 					<div class="woo-wallet-add-amount">
 						<label for="woo_wallet_balance_to_add"><?php esc_html_e( 'Enter amount', 'woo-wallet' ); ?></label>
 						<?php
@@ -108,6 +108,7 @@ $menu_items                = apply_filters(
 							}
 							.gatewaya-box input[type="radio"] + label {
 								background-image: none;
+								padding: 25px 0 0 0;
 							}
 							.gatewaya-box label {
 								flex-grow: 1;
@@ -134,10 +135,10 @@ $menu_items                = apply_filters(
 						<div class="all-payment">
 							<?php 
 							// Check if WooCommerce is active
+							
 							if (class_exists('Wc_Payment_Gateways')){
 								// Get active payment gateways
 								$payment_gateways = WC_Payment_Gateways::instance()->get_available_payment_gateways();
-								
 								// Loop through the active payment gateways and display their names
 								foreach($payment_gateways as $gateway) {
 
@@ -145,10 +146,19 @@ $menu_items                = apply_filters(
 									$image_url = $gateway->get_icon();
 									$title = $gateway->get_title();
 									$gateway_id = $gateway->id;
+									$gateway_min_amount = get_option( 'wc_settings_min_' . $gateway_id, 0 );
+
 									?>
-									
+									<div class="gatewaya-box">
+										<input type="radio" required id="<?php echo $gateway_id;?>" name="selected_payment_gateway" value="<?php echo $gateway_id;?>">
+										<label class="gatewaya-box-label" for="<?php echo $gateway_id;?>">
+											<span><?php echo $title; ?></span>
+											<br>
+											<span><?php echo "Minimum Deposit: " . $gateway_min_amount;?></span>
+										</label>
+									</div>
 									<?php
-									echo "<pre>"; print_r($gateway); echo "</pre>";
+									
 								}
 							}
 							?>
@@ -225,4 +235,18 @@ function submitForm() {
     var form = document.getElementById('wallet_form');
     form.submit();
 }
+function validateForm() {
+        var selectedAmount = parseFloat(document.getElementById("woo_wallet_balance_to_add").value);
+        var selectedGateway = document.querySelector('input[name="selected_payment_gateway"]:checked');
+        if (!selectedGateway) {
+            alert("Please select a payment gateway.");
+            return false;
+        }
+        var minAmount = parseFloat(selectedGateway.nextElementSibling.querySelector('span:last-child').textContent.replace("Minimum Deposit: ", ""));
+        if (selectedAmount < minAmount) {
+            alert("Amount must be at least Diposit: " + minAmount);
+            return false;
+        }
+        return true;
+    }
 </script>
