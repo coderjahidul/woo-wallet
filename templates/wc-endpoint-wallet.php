@@ -140,18 +140,15 @@ $menu_items                = apply_filters(
 								
 								// Loop through the active payment gateways and display their names
 								foreach($payment_gateways as $gateway) {
+
+									if($gateway->id == "wallet") continue;
 									$image_url = $gateway->get_icon();
 									$title = $gateway->get_title();
 									$gateway_id = $gateway->id;
 									?>
-									<div class="gatewaya-box">
-										<input type="radio" required id="<?php echo $gateway_id;?>" name="selected_payment_gateway" value="<?php echo $gateway_id;?>">
-										<label class="gatewaya-box-label" for="<?php echo $gateway_id;?>">
-											
-											<span><?php echo $title; ?></span>
-										</label>
-									</div>
+									
 									<?php
+									echo "<pre>"; print_r($gateway); echo "</pre>";
 								}
 							}
 							?>
