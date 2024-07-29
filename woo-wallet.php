@@ -73,6 +73,8 @@ function process_woo_wallet_form_submission() {
         if (isset($_POST['selected_payment_gateway'])) {
             $selected_gateway = sanitize_text_field($_POST['selected_payment_gateway']);
             setcookie('selected_payment_gateway', $selected_gateway, time() + 3600, '/');
+			// add a cookie to hide the form on checkout page woo_wallet 
+			setcookie('woo_wallet_hide', '1', time() + 360, '/');
         }
     }
 }
